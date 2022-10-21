@@ -7,11 +7,12 @@ import numpy as np
 
 class DatasetTrial(object):
 	"""docstring for ClassName"""
-	def __init__(self, arg):
-		dataset, info = tfds.load('oxford_iiit_pet:3.*.*', with_info=True)
-		print(info)
+	def __init__(self):
 		super(DatasetTrial, self).__init__()
-		self.arg = arg
+		self.dataset, self.info = tfds.load('oxford_iiit_pet:3.*.*', with_info=True)
+		print(self.info)
+		
+		# self.arg = arg
 		
 
 	def resize(input_image, input_mask):
@@ -50,12 +51,22 @@ class DatasetTrial(object):
 
 		return input_image, input_mask
 
-train_dataset = dataset["train"].map(load_image_train, num_parallel_calls=tf.data.AUTOTUNE)
-test_dataset = dataset["test"].map(load_image_test, num_parallel_calls=tf.data.AUTOTUNE)
+	def get_train_dataset():
+		train_dataset = dataset["train"].map(load_image_train, num_parallel_calls=tf.data.AUTOTUNE)
 
-BATCH_SIZE = 64
-BUFFER_SIZE = 1000
-train_batches = train_dataset.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
-train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-validation_batches = test_dataset.take(3000).batch(BATCH_SIZE)
-test_batches = test_dataset.skip(3000).take(669).batch(BATCH_SIZE)
+		return train_dataset
+
+	def get_test_dataset():
+		test_dataset = dataset["test"].map(load_image_test, num_parallel_calls=tf.data.AUTOTUNE)
+
+		return test_dataset
+
+# train_dataset = dataset["train"].map(load_image_train, num_parallel_calls=tf.data.AUTOTUNE)
+# test_dataset = dataset["test"].map(load_image_test, num_parallel_calls=tf.data.AUTOTUNE)
+
+# BATCH_SIZE = 64
+# BUFFER_SIZE = 1000
+# train_batches = train_dataset.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+# train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+# validation_batches = test_dataset.take(3000).batch(BATCH_SIZE)
+# test_batches = test_dataset.skip(3000).take(669).batch(BATCH_SIZE)
