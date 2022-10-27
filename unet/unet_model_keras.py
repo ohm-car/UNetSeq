@@ -46,7 +46,7 @@ class UNet(object):
 	def create_model(self):
 
 		 # inputs
-		inputs = layers.Input(shape=(128,128,3))
+		inputs = layers.Input(shape=(384,384,3))
 
 		# encoder: contracting path - downsample
 		# 1 - downsample

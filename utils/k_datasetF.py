@@ -5,33 +5,60 @@ import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import skimage.io
+
 
 class DatasetUSound(object):
 	"""docstring for ClassName"""
 	def __init__(self):
 		super(DatasetUSound, self).__init__()
 		
-		self.load_dataset()
+		# self.load_dataset()
 
-		print(self.dataset)
+		# print(self.dataset)
 		
 		# self.arg = arg
 		
 
 	def load_dataset(self):
 
-		path = path
+		imgpath = os.path.abspath('../data/Img_All_Squared/')
+		maskpath = os.path.abspath('../data/Masks_All_Squared/')
+		# print(path)
 
-		
+		images = []
+		masks = []
 
-		img = keras.utils.load_img(
-		    path,
-		    grayscale=False,
-		    color_mode='rgb',
-		    target_size=None,
-		    interpolation='nearest',
-		    keep_aspect_ratio=False
-		)
+		for i in range(30):
+
+			img = skimage.io.imread(imgpath + '/' + str(i) + '.png')
+
+		# 	img = keras.utils.load_img(imgpath + '/' + str(i) + '.png',
+		#     imgpath + '/' + str(i) + '.png',
+		#     grayscale=False,
+		#     color_mode='rgb',
+		#     target_size=None,
+		#     interpolation='nearest',
+		#     # keep_aspect_ratio=False
+		# )
+			images.append(img)
+			# print(type(img))
+
+			mask = skimage.io.imread(maskpath + '/' + str(i) + '.png', as_gray=True)
+
+		# 	mask = keras.utils.load_img(
+		#     maskpath + '/' + str(i) + '.png',
+		#     grayscale=False,
+		#     color_mode='rgb',
+		#     target_size=None,
+		#     interpolation='nearest',
+		#     # keep_aspect_ratio=False
+		# )
+			masks.append(mask)
+
+
+
+		return np.array(images), np.array(masks)
 
 
 
