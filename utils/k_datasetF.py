@@ -4,17 +4,36 @@ from tensorflow.keras import layers
 import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
-class DatasetTrial(object):
+class DatasetUSound(object):
 	"""docstring for ClassName"""
 	def __init__(self):
-		super(DatasetTrial, self).__init__()
-		self.dataset, self.info = tfds.load('oxford_iiit_pet:3.*.*', with_info=True)
-		print(self.dataset["train"])
-		print(self.dataset["test"])
+		super(DatasetUSound, self).__init__()
+		
+		self.load_dataset()
+
+		print(self.dataset)
 		
 		# self.arg = arg
 		
+
+	def load_dataset(self):
+
+		path = path
+
+		
+
+		img = keras.utils.load_img(
+		    path,
+		    grayscale=False,
+		    color_mode='rgb',
+		    target_size=None,
+		    interpolation='nearest',
+		    keep_aspect_ratio=False
+		)
+
+
 
 	def resize(self, input_image, input_mask):
 		input_image = tf.image.resize(input_image, (128, 128), method="nearest")
@@ -54,7 +73,7 @@ class DatasetTrial(object):
 
 	def get_train_dataset(self):
 		train_dataset = self.dataset["train"].map(self.load_image_train, num_parallel_calls=tf.data.AUTOTUNE)
-		print((train_dataset))
+		print(type(train_dataset))
 		return train_dataset
 
 	def get_test_dataset(self):

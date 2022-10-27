@@ -9,13 +9,13 @@ info = dataset.get_info()
 
 unet_model = UNet().create_model()
 
-print(type(unet_model))
+# print(type(unet_model))
 # unet_model.build(input_shape = (128,128,3))
 unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
                   loss="sparse_categorical_crossentropy",
                   metrics="accuracy")
 
-print(unet_model.summary())
+# print(unet_model.summary())
 
 BATCH_SIZE = 16
 BUFFER_SIZE = 1000
@@ -33,9 +33,11 @@ VAL_SUBSPLITS = 5
 TEST_LENTH = info.splits["test"].num_examples
 VALIDATION_STEPS = TEST_LENTH // BATCH_SIZE // VAL_SUBSPLITS
 
-model_history = unet_model.fit(train_batches,
-                              epochs=NUM_EPOCHS,
-                              steps_per_epoch=STEPS_PER_EPOCH,
-                              validation_steps=VALIDATION_STEPS,
-                              validation_data=test_batches)
+# print(type(info))
+
+# model_history = unet_model.fit(train_batches,
+#                               epochs=NUM_EPOCHS,
+#                               steps_per_epoch=STEPS_PER_EPOCH,
+#                               validation_steps=VALIDATION_STEPS,
+#                               validation_data=test_batches)
 
