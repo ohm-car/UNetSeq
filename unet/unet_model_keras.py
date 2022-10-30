@@ -46,7 +46,7 @@ class UNet(object):
 	def create_model(self):
 
 		 # inputs
-		inputs = layers.Input(shape=(384,384,3))
+		inputs = layers.Input(shape=(None,384,384,3))
 
 		# encoder: contracting path - downsample
 		# 1 - downsample
@@ -70,9 +70,17 @@ class UNet(object):
 		u8 = self.upsample_block(u7, f2, 128)
 		# 9 - upsample
 		u9 = self.upsample_block(u8, f1, 64)
+		print(u9.shape)
+
+		u10 = layers.Reshape((2,384,384,32))(u9)
+		print(u10.shape)
+
+		u11 = layers.ConvLSTM2D(16, kernel_size=3, padding='same')(u10)
+		print(u11.shape)
 
 		# outputs
-		outputs = layers.Conv2D(3, 1, padding="same", activation = "softmax")(u9)
+		outputs = layers.Conv2D(3, 1, padding="same", activation = "softmax")(u11)
+		print(outputs.shape)
 
 		# unet model with Keras Functional API
 		unet_model = tf.keras.Model(inputs, outputs, name="U-Net")

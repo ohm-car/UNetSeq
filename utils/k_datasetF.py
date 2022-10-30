@@ -29,36 +29,22 @@ class DatasetUSound(object):
 		images = []
 		masks = []
 
-		for i in range(30):
+		for i in range(90):
 
 			img = skimage.io.imread(imgpath + '/' + str(i) + '.png')
-
-		# 	img = keras.utils.load_img(imgpath + '/' + str(i) + '.png',
-		#     imgpath + '/' + str(i) + '.png',
-		#     grayscale=False,
-		#     color_mode='rgb',
-		#     target_size=None,
-		#     interpolation='nearest',
-		#     # keep_aspect_ratio=False
-		# )
 			images.append(img)
-			# print(type(img))
 
-			mask = skimage.io.imread(maskpath + '/' + str(i) + '.png', as_gray=True)
-
-		# 	mask = keras.utils.load_img(
-		#     maskpath + '/' + str(i) + '.png',
-		#     grayscale=False,
-		#     color_mode='rgb',
-		#     target_size=None,
-		#     interpolation='nearest',
-		#     # keep_aspect_ratio=False
-		# )
+			mask = skimage.io.imread(maskpath + '/' + str(i) + '.png')
+			mask = np.sum(mask, axis = 2) == 765
+			mask = np.expand_dims(mask, axis=2)
 			masks.append(mask)
 
+		images = np.array(images)
+		masks = np.array(masks)
+		print('images.shape:', images.shape)
+		print('masks.shape:', masks.shape)
 
-
-		return np.array(images), np.array(masks)
+		return images, masks
 
 
 
