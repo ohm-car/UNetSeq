@@ -47,7 +47,7 @@ unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
 model_history = unet_model.fit(
     x=imgs,
     y=masks,
-    batch_size=2,
+    batch_size=1,
     epochs=1,
     verbose='auto',
     callbacks=None,
@@ -65,3 +65,7 @@ model_history = unet_model.fit(
     workers=1,
     use_multiprocessing=False
 )
+
+unet_model.save('trialModel')
+unet_model.save('trm1', save_format='h5')
+m2 = tf.keras.models.load_model('trialModel')

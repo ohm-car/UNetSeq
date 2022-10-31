@@ -29,10 +29,13 @@ class DatasetUSound(object):
 		images = []
 		masks = []
 
-		for i in range(90):
+		for i in range(2, 92):
 
-			img = skimage.io.imread(imgpath + '/' + str(i) + '.png')
-			images.append(img)
+			imgs = []
+			for j in range(3):
+				img = skimage.io.imread(imgpath + '/' + str(i + j - 2) + '.png')
+				imgs.append(img)
+			images.append(imgs)
 
 			mask = skimage.io.imread(maskpath + '/' + str(i) + '.png')
 			mask = np.sum(mask, axis = 2) == 765
