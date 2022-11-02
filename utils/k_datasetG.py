@@ -57,7 +57,7 @@ class DatasetUSound(keras.utils.Sequence):
 			M1 = M1*1
 			mask = np.expand_dims(mask, axis=2)
 			M1 = np.expand_dims(M1, axis=2)
-			mask = np.concatenate((mask, M1), axis = 3)
+			mask = np.concatenate((mask, M1), axis = 2)
 			maskseq.append(mask)
 
 
