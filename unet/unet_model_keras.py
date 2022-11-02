@@ -51,10 +51,10 @@ class UNet(object):
 
 		return x
 
-	def create_model(self):
+	def create_model(self, seqlen):
 
 		 # inputs
-		inputs = layers.Input(shape=(3, 384,384,3))
+		inputs = layers.Input(shape=(seqlen, 384,384,3))
 
 		# encoder: contracting path - downsample
 		# 1 - downsample

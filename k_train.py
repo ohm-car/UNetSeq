@@ -56,13 +56,18 @@ def load_sequences_lists(seqlen):
 
         return trainseq, valseq, trainmseq, valmseq
 
-trSeq, valSeq, trMasks, valMasks = load_sequences_lists(3)
+trSeq, valSeq, trMasks, valMasks = load_sequences_lists(5)
 
-imageDir = '/home/omkar/ArteryProj/data/Img_All_Squared/'
-masksDir = '/home/omkar/ArteryProj/data/Masks_All_Squared/'
+# imageDir = '/home/omkar/ArteryProj/data/Img_All_Squared/'
+# masksDir = '/home/omkar/ArteryProj/data/Masks_All_Squared/'
+# checkpoint_path = "/home/omkar/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
 
-train_gen = DatasetUSound(2, imageDir, masksDir, trSeq, trMasks, 3)
-val_gen = DatasetUSound(2, imageDir, masksDir, valSeq, valMasks, 3)
+imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
+masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
+checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
+
+train_gen = DatasetUSound(4, imageDir, masksDir, trSeq, trMasks, 5)
+val_gen = DatasetUSound(4, imageDir, masksDir, valSeq, valMasks, 5)
 
 # dataset = DatasetUSound()
 print(train_gen.__class__.__bases__)
@@ -70,7 +75,7 @@ print(train_gen.__getitem__(14)[0].shape)
 print(train_gen.__getitem__(14)[1].shape)
 # imgs, masks = dataset.load_dataset()
 
-unet_model = UNet().create_model()
+unet_model = UNet().create_model(seqlen = 5)
 
 # print(len(imgs))
 # print(len(masks))
@@ -103,6 +108,13 @@ unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
 
 #create callbacks
 
+callbacks = [
+            # keras.callbacks.TensorBoard(log_dir=self.log_dir,
+            #                             histogram_freq=0, write_graph=True, write_images=False),
+            tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
+                                            verbose=0, save_weights_only=False, save_freq = 5*train_gen.__len__()),
+        ]
+
 # model_history = unet_model.fit(
 #     x=train_gen,
 #     batch_size=1,
@@ -127,9 +139,9 @@ unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
 model_history = unet_model.fit(
     x=train_gen,
     # batch_size=1,
-    epochs=1,
+    epochs=80,
     verbose='auto',
-    callbacks=None,
+    callbacks=callbacks,
     # validation_split=None,
     validation_data=val_gen,
     shuffle=True,
@@ -137,14 +149,14 @@ model_history = unet_model.fit(
     sample_weight=None,
     initial_epoch=0,
     steps_per_epoch=None,
-    validation_steps=None,
-    validation_batch_size=None,
-    validation_freq=4,
+    # validation_steps=None,
+    # validation_batch_size=None,
+    validation_freq=1,
     max_queue_size=10,
     workers=1,
     use_multiprocessing=False
 )
 
-unet_model.save('trialModel')
+# unet_model.save('trialModel')
 # unet_model.save('trm1', save_format='h5')
-m2 = tf.keras.models.load_model('trialModel')
+# m2 = tf.keras.models.load_model('trialModel')
