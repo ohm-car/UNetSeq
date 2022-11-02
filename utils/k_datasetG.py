@@ -45,6 +45,7 @@ class DatasetUSound(keras.utils.Sequence):
 			imgs = []
 			for frame in seq:
 				img = skimage.io.imread(self.imgdir + str(frame) + '.png')
+				img = img/255
 				imgs.append(img)
 			imgseq.append(np.array(imgs))
 
