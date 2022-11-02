@@ -1,7 +1,9 @@
+import os
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import tensorflow as tf
 # from utils.k_dataset import DatasetTrial
 from unet.unet_model_keras import UNet
-from utils.k_datasetF import DatasetUSound
+from utils.k_datasetG import DatasetUSound
 # import skimage
 
 # dataset = DatasetTrial()
@@ -9,14 +11,69 @@ from utils.k_datasetF import DatasetUSound
 # data_ts = dataset.get_test_dataset()
 # info = dataset.get_info()
 
-dataset = DatasetUSound()
+def load_sequences_lists(seqlen):
 
-imgs, masks = dataset.load_dataset()
+        trainseq = list()
+        trainmseq = list()
+        valseq = list()
+        valmseq = list()
+
+        for i in range(2694):
+
+            if((i - 5) % 6 == 0):
+                
+                tmpseq = list()
+                for j in range(seqlen//2):
+                    k = i - 6*(seqlen//2  - j)
+                    tmpseq.append(k if k >=0 else (k + 6*(int(abs(k/6)) + 1)))
+                tmpseq.append(i)
+                for j in range(seqlen//2):
+                    k = i + 6*(j+1)
+                    if(i <= 2675):
+                        tmpseq.append(k if k <= 2693 else (k - 6*(int(abs((k-2693)/6)) + 1)))
+                    else:
+                        tmpseq.append(k if k <= 2693 else (k - 6*(int(abs((k-2693)/6)))))
+
+                valseq.append(tmpseq)
+                valmseq.append(i)
+
+            else:
+                
+                tmpseq = list()
+                for j in range(seqlen//2):
+                    k = i - 6*(seqlen//2  - j)
+                    if(i%6 == 0):
+                        tmpseq.append(k if k >=0 else (k + 6*(int(abs(k/6)))))
+                    else:
+                        tmpseq.append(k if k >=0 else (k + 6*(int(abs(k/6)) + 1)))
+                tmpseq.append(i)
+                for j in range(seqlen//2):
+                    k = i + 6*(j+1)
+                    tmpseq.append(k if k <= 2693 else (k - 6*(int(abs((k-2693)/6)) + 1)))
+
+                trainseq.append(tmpseq)
+                trainmseq.append(i)
+
+        return trainseq, valseq, trainmseq, valmseq
+
+trSeq, valSeq, trMasks, valMasks = load_sequences_lists(3)
+
+imageDir = '/home/omkar/ArteryProj/data/Img_All_Squared/'
+masksDir = '/home/omkar/ArteryProj/data/Masks_All_Squared/'
+
+train_gen = DatasetUSound(2, imageDir, masksDir, trSeq, trMasks, 3)
+val_gen = DatasetUSound(2, imageDir, masksDir, valSeq, valMasks, 3)
+
+# dataset = DatasetUSound()
+print(train_gen.__class__.__bases__)
+print(train_gen.__getitem__(14)[0].shape)
+print(train_gen.__getitem__(14)[1].shape)
+# imgs, masks = dataset.load_dataset()
 
 unet_model = UNet().create_model()
 
-print(len(imgs))
-print(len(masks))
+# print(len(imgs))
+# print(len(masks))
 
 # print(type(unet_model))
 # unet_model.build(input_shape = (128,128,3))
@@ -44,15 +101,37 @@ unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
 
 # print(type(info))
 
+#create callbacks
+
+# model_history = unet_model.fit(
+#     x=train_gen,
+#     batch_size=1,
+#     epochs=1,
+#     verbose='auto',
+#     callbacks=None,
+#     validation_split=None,
+#     validation_data=(imgs, masks),
+#     shuffle=True,
+#     class_weight=None,
+#     sample_weight=None,
+#     initial_epoch=0,
+#     steps_per_epoch=None,
+#     validation_steps=None,
+#     validation_batch_size=None,
+#     validation_freq=1,
+#     max_queue_size=10,
+#     workers=1,
+#     use_multiprocessing=False
+# )
+
 model_history = unet_model.fit(
-    x=imgs,
-    y=masks,
-    batch_size=1,
+    x=train_gen,
+    # batch_size=1,
     epochs=1,
     verbose='auto',
     callbacks=None,
-    validation_split=None,
-    validation_data=(imgs, masks),
+    # validation_split=None,
+    validation_data=val_gen,
     shuffle=True,
     class_weight=None,
     sample_weight=None,
@@ -60,12 +139,12 @@ model_history = unet_model.fit(
     steps_per_epoch=None,
     validation_steps=None,
     validation_batch_size=None,
-    validation_freq=1,
+    validation_freq=4,
     max_queue_size=10,
     workers=1,
     use_multiprocessing=False
 )
 
 unet_model.save('trialModel')
-unet_model.save('trm1', save_format='h5')
+# unet_model.save('trm1', save_format='h5')
 m2 = tf.keras.models.load_model('trialModel')
