@@ -56,7 +56,10 @@ def load_sequences_lists(seqlen):
 
         return trainseq, valseq, trainmseq, valmseq
 
-trSeq, valSeq, trMasks, valMasks = load_sequences_lists(5)
+seqlen = 9
+BATCH_SIZE = 4
+
+trSeq, valSeq, trMasks, valMasks = load_sequences_lists(seqlen)
 
 # imageDir = '/home/omkar/ArteryProj/data/Img_All_Squared/'
 # masksDir = '/home/omkar/ArteryProj/data/Masks_All_Squared/'
@@ -66,10 +69,10 @@ imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
 masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
 checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
 
-seqlen = 9
 
-train_gen = DatasetUSound(4, imageDir, masksDir, trSeq, trMasks, seqlen)
-val_gen = DatasetUSound(4, imageDir, masksDir, valSeq, valMasks, seqlen)
+
+train_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, trSeq, trMasks, seqlen)
+val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, valSeq, valMasks, seqlen)
 
 # dataset = DatasetUSound()
 print(train_gen.__class__.__bases__)
