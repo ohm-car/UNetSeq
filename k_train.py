@@ -66,8 +66,10 @@ imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
 masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
 checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
 
-train_gen = DatasetUSound(4, imageDir, masksDir, trSeq, trMasks, 5)
-val_gen = DatasetUSound(4, imageDir, masksDir, valSeq, valMasks, 5)
+seqlen = 9
+
+train_gen = DatasetUSound(4, imageDir, masksDir, trSeq, trMasks, seqlen)
+val_gen = DatasetUSound(4, imageDir, masksDir, valSeq, valMasks, seqlen)
 
 # dataset = DatasetUSound()
 print(train_gen.__class__.__bases__)
@@ -75,16 +77,21 @@ print(train_gen.__getitem__(14)[0].shape)
 print(train_gen.__getitem__(14)[1].shape)
 # imgs, masks = dataset.load_dataset()
 
-unet_model = UNet().create_model(seqlen = 5)
+strategy = tf.distribute.MirroredStrategy()
+print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-# print(len(imgs))
-# print(len(masks))
+with strategy.scope():
 
-# print(type(unet_model))
-# unet_model.build(input_shape = (128,128,3))
-unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
-                  loss="sparse_categorical_crossentropy",
-                  metrics="accuracy")
+    unet_model = UNet().create_model(seqlen = seqlen)
+
+    # print(len(imgs))
+    # print(len(masks))
+
+    # print(type(unet_model))
+    # unet_model.build(input_shape = (128,128,3))
+    unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
+                      loss="sparse_categorical_crossentropy",
+                      metrics="accuracy")
 
 # print(unet_model.summary())
 
