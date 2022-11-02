@@ -87,7 +87,7 @@ class UNet(object):
 		print("U11:", u11.shape)
 
 		# outputs
-		outputs = layers.Conv2D(1, 1, padding="same", activation = "softmax")(u11)
+		outputs = layers.Conv2D(2, 3, padding="same", activation = "softmax")(u11)
 		print("outputs:", outputs.shape)
 
 		# unet model with Keras Functional API

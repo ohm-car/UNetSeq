@@ -92,7 +92,7 @@ with strategy.scope():
 
     # print(type(unet_model))
     # unet_model.build(input_shape = (128,128,3))
-    unet_model.compile(optimizer=tf.keras.optimizers.Adam(),
+    unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
                       loss="sparse_categorical_crossentropy",
                       metrics="accuracy")
 
