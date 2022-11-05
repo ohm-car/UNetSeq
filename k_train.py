@@ -67,7 +67,7 @@ trSeq, valSeq, trMasks, valMasks = load_sequences_lists(seqlen)
 
 imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
 masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
-checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
+checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpointsR4/model_{epoch:03d}"
 
 
 
