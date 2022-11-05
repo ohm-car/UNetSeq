@@ -45,7 +45,8 @@ class UNet(object):
 		# concatenate
 		x = layers.concatenate([out1, conv_features])
 		# dropout
-		x = layers.Dropout(0.3)(x)
+		drop = layers.Dropout(0.3)
+		x = layers.TimeDistributed(drop)(x)
 		# Conv2D twice with ReLU activation
 		x = self.double_conv_block(x, n_filters)
 
