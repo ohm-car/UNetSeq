@@ -52,12 +52,22 @@ class DatasetUSound(keras.utils.Sequence):
 		for maskid in batch_masks:
 			mask = skimage.io.imread(self.maskdir + str(maskid) + '.png')
 			mask = np.sum(mask, axis = 2) == 765
-			M1 = ~mask
+			# print("MASK SHAPE:", mask.shape)
+
+			# M1 = ~mask
 			mask = mask*1
-			M1 = M1*1
+			# M1 = M1*1
 			mask = np.expand_dims(mask, axis=2)
-			M1 = np.expand_dims(M1, axis=2)
-			mask = np.concatenate((mask, M1), axis = 2)
+			# M1 = np.expand_dims(M1, axis=2)
+			# mask = np.concatenate((mask, M1), axis = 2)
+			
+			c = 0
+			for j in mask:
+				for i in j:
+					if i[0] == True:
+						c += 1
+			# print("c:", c)
+
 			maskseq.append(mask)
 
 

@@ -56,8 +56,8 @@ def load_sequences_lists(seqlen):
 
         return trainseq, valseq, trainmseq, valmseq
 
-seqlen = 9
-BATCH_SIZE = 4
+seqlen = 3
+BATCH_SIZE = 1
 
 trSeq, valSeq, trMasks, valMasks = load_sequences_lists(seqlen)
 
@@ -78,6 +78,7 @@ val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, valSeq, valMasks, seqlen
 print(train_gen.__class__.__bases__)
 print(train_gen.__getitem__(14)[0].shape)
 print(train_gen.__getitem__(14)[1].shape)
+# print(train_gen.__getitem__(14)[1])
 # imgs, masks = dataset.load_dataset()
 
 strategy = tf.distribute.MirroredStrategy()
@@ -93,7 +94,7 @@ with strategy.scope():
     # print(type(unet_model))
     # unet_model.build(input_shape = (128,128,3))
     unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
-                      loss="sparse_categorical_crossentropy",
+                      loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics="accuracy")
 
 # print(unet_model.summary())
