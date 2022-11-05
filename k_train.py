@@ -56,8 +56,8 @@ def load_sequences_lists(seqlen):
 
         return trainseq, valseq, trainmseq, valmseq
 
-seqlen = 3
-BATCH_SIZE = 1
+seqlen = 9
+BATCH_SIZE = 4
 
 trSeq, valSeq, trMasks, valMasks = load_sequences_lists(seqlen)
 
