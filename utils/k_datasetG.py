@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-import tensorflow_datasets as tfds
+# import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -70,7 +70,7 @@ class DatasetUSound(keras.utils.Sequence):
 
 			maskseq.append(mask)
 
-
+		print("returned batch")
 		return np.array(imgseq), np.array(maskseq)
 
 	def __len__(self):

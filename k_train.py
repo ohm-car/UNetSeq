@@ -1,10 +1,11 @@
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import tensorflow as tf
 # from utils.k_dataset import DatasetTrial
 from unet.unet_model_keras import UNet
 from utils.k_datasetG import DatasetUSound
 # import skimage
+from pathlib import Path
 
 # dataset = DatasetTrial()
 # data_tr = dataset.get_train_dataset()
@@ -56,18 +57,20 @@ def load_sequences_lists(seqlen):
 
         return trainseq, valseq, trainmseq, valmseq
 
-seqlen = 9
-BATCH_SIZE = 4
+seqlen = 3
+BATCH_SIZE = 1
 
 trSeq, valSeq, trMasks, valMasks = load_sequences_lists(seqlen)
 
-# imageDir = '/home/omkar/ArteryProj/data/Img_All_Squared/'
-# masksDir = '/home/omkar/ArteryProj/data/Masks_All_Squared/'
-# checkpoint_path = "/home/omkar/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
+print("rootDir:", Path(__file__).resolve())
 
-imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
-masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
-checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpointsR4/model_{epoch:03d}"
+imageDir = '/home/omkar/ArteryProj/data/Img_All_Squared/'
+masksDir = '/home/omkar/ArteryProj/data/Masks_All_Squared/'
+checkpoint_path = "/home/omkar/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
+
+# imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
+# masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
+# checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpointsR4/model_{epoch:03d}"
 
 
 
@@ -81,21 +84,21 @@ print(train_gen.__getitem__(14)[1].shape)
 # print(train_gen.__getitem__(14)[1])
 # imgs, masks = dataset.load_dataset()
 
-strategy = tf.distribute.MirroredStrategy()
-print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+# strategy = tf.distribute.MirroredStrategy()
+# print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-with strategy.scope():
+# with strategy.scope():
 
-    unet_model = UNet().create_model(seqlen = seqlen)
+unet_model = UNet().create_model(seqlen = seqlen)
 
-    # print(len(imgs))
-    # print(len(masks))
+# print(len(imgs))
+# print(len(masks))
 
-    # print(type(unet_model))
-    # unet_model.build(input_shape = (128,128,3))
-    unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
-                      loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                      metrics="accuracy")
+# print(type(unet_model))
+# unet_model.build(input_shape = (128,128,3))
+unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
+                  loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                  metrics="accuracy")
 
 # print(unet_model.summary())
 
@@ -151,7 +154,7 @@ model_history = unet_model.fit(
     x=train_gen,
     # batch_size=1,
     epochs=80,
-    verbose='auto',
+    verbose=1,
     callbacks=callbacks,
     # validation_split=None,
     validation_data=val_gen,
