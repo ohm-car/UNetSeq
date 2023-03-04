@@ -12,70 +12,57 @@ from pathlib import Path
 # data_ts = dataset.get_test_dataset()
 # info = dataset.get_info()
 
-def load_sequences_lists(seqlen):
+def load_sequences_lists(seqlen, vid_ids):
 
-        trainseq = list()
-        trainmseq = list()
-        valseq = list()
-        valmseq = list()
+    seq_list = list()
+    mask_list = list()
 
-        for i in range(2694):
+    for vid_id in vid_ids:
 
-            if((i - 5) % 6 == 0):
-                
-                tmpseq = list()
-                for j in range(seqlen//2):
-                    k = i - 6*(seqlen//2  - j)
-                    tmpseq.append(k if k >=0 else (k + 6*(int(abs(k/6)) + 1)))
-                tmpseq.append(i)
-                for j in range(seqlen//2):
-                    k = i + 6*(j+1)
-                    if(i <= 2675):
-                        tmpseq.append(k if k <= 2693 else (k - 6*(int(abs((k-2693)/6)) + 1)))
-                    else:
-                        tmpseq.append(k if k <= 2693 else (k - 6*(int(abs((k-2693)/6)))))
+        for i in range(1, 450):
 
-                valseq.append(tmpseq)
-                valmseq.append(i)
+            seq = list()
 
-            else:
-                
-                tmpseq = list()
-                for j in range(seqlen//2):
-                    k = i - 6*(seqlen//2  - j)
-                    if(i%6 == 0):
-                        tmpseq.append(k if k >=0 else (k + 6*(int(abs(k/6)))))
-                    else:
-                        tmpseq.append(k if k >=0 else (k + 6*(int(abs(k/6)) + 1)))
-                tmpseq.append(i)
-                for j in range(seqlen//2):
-                    k = i + 6*(j+1)
-                    tmpseq.append(k if k <= 2693 else (k - 6*(int(abs((k-2693)/6)) + 1)))
+            for j in range((i - seqlen//2), (i + seqlen//2) + 1):
+                seq.append(j)
 
-                trainseq.append(tmpseq)
-                trainmseq.append(i)
+            for j in range(len(seq)):
+                if(seq[j] < 1):
+                    seq[j] = vid_id + 'f1'
+                elif(seq[j] > 449):
+                    seq[j] = vid_id + 'f449'
+                else:
+                    seq[j] = vid_id + 'f' + str(seq[j])
+            seq_list.append(seq)
+            mask_list.append(vid_id + 'f' + str(i))
 
-        return trainseq, valseq, trainmseq, valmseq
+    return seq_list, mask_list
 
 seqlen = 3
 BATCH_SIZE = 1
 
-trSeq, valSeq, trMasks, valMasks = load_sequences_lists(seqlen)
+# seq_list, mask_list = load_sequences_lists(seqlen)
 
-print("rootDir:", Path(__file__).resolve())
-
-imageDir = '/home/omkar/ArteryProj/data/Img_All_Squared/'
-masksDir = '/home/omkar/ArteryProj/data/Masks_All_Squared/'
-checkpoint_path = "/home/omkar/ArteryProj/UNetSeq/checkpoints/model_{epoch:03d}"
+rootDir = Path(__file__).resolve().parent.parent
+print(rootDir)
+imageDir = os.path.join(rootDir, 'data/Img_All_Squared/')
+masksDir = os.path.join(rootDir, 'data/Masks_All_Squared/')
+checkpoint_path = os.path.join(rootDir, 'UNetSeq/checkpoints/model_{epoch:03d}')
 
 # imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
 # masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
 # checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpointsR4/model_{epoch:03d}"
 
+train_vid_ids = ['v1', 'v2', 'v3', 'v4', 'v6']
+val_vid_ids = ['v5']
 
+# print(load_sequences_lists(3, train_vid_ids))
 
-train_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, trSeq, trMasks, seqlen)
-val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, valSeq, valMasks, seqlen)
+train_seq, train_mask = load_sequences_lists(3, train_vid_ids)
+val_seq, val_mask = load_sequences_lists(3, val_vid_ids)
+
+train_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, train_seq, train_mask, seqlen)
+val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, val_seq, val_mask, seqlen)
 
 # dataset = DatasetUSound()
 print(train_gen.__class__.__bases__)

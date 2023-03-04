@@ -10,32 +10,24 @@ import skimage.io
 
 class DatasetUSound(keras.utils.Sequence):
 	"""docstring for ClassName"""
-	def __init__(self, batch_size, imgdir, maskdir, imglist, maskslist, seqlen):
+	def __init__(self, batch_size, imgdir, maskdir, seq_list, mask_list, seqlen):
 		
 		self.batch_size = batch_size
 		self.imgdir = imgdir
 		self.maskdir = maskdir
 		self.seqlen = seqlen
 
-		self.imglist = imglist
+		self.seq_list = seq_list
 		# self.seqVAL = list()
-		self.maskslist = maskslist
-		# self.masqVAL = list()
+		self.mask_list = mask_list
 
-		# self.load_sequences_lists()
-
-		# self.load_dataset()
-
-		# print(self.dataset)
-		
-		# self.arg = arg
 
 	def __getitem__(self, idx):
 
 		#DEFINE THIS!!
 
-		batch_seq = self.imglist[idx*self.batch_size:(idx+1)*self.batch_size]
-		batch_masks = self.maskslist[idx*self.batch_size:(idx+1)*self.batch_size]
+		batch_seq = self.seq_list[idx*self.batch_size:(idx+1)*self.batch_size]
+		batch_masks = self.mask_list[idx*self.batch_size:(idx+1)*self.batch_size]
 
 
 		imgseq = list()
@@ -61,23 +53,22 @@ class DatasetUSound(keras.utils.Sequence):
 			# M1 = np.expand_dims(M1, axis=2)
 			# mask = np.concatenate((mask, M1), axis = 2)
 			
-			c = 0
-			for j in mask:
-				for i in j:
-					if i[0] == True:
-						c += 1
+			# c = 0
+			# for j in mask:
+			# 	for i in j:
+			# 		if i[0] == True:
+			# 			c += 1
 			# print("c:", c)
 
 			maskseq.append(mask)
 
-		print("returned batch")
 		return np.array(imgseq), np.array(maskseq)
 
 	def __len__(self):
 
 		#DEFINE THIS!!
 
-		return int(len(self.imglist)/self.batch_size)
+		return int(len(self.seq_list)/self.batch_size)
 
 		# return trainseq, valseq
 
