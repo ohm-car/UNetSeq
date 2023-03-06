@@ -5,9 +5,9 @@
 #SBATCH --mem=144G
 #SBATCH --gres=gpu:4
 #SBATCH --time=10-12:00:00
-#SBATCH --constraint=rtx_6000
-#SBATCH --output=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_1.out
-#SBATCH --error=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_1.err
+#SBATCH --constraint=rtx_8000
+#SBATCH --output=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_2.out
+#SBATCH --error=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_2.err
 
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
