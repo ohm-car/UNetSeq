@@ -61,6 +61,8 @@ if __name__ == '__main__':
 
     print("Train Videos: ", train_vid_ids)
     print("Val Videos: ", val_vid_ids)
+    print("Sequence Length: ", seqlen)
+    print("Batch Size: ", BATCH_SIZE)
 
     # print(load_sequences_lists(3, train_vid_ids))
 
