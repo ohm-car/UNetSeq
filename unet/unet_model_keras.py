@@ -23,7 +23,7 @@ class UNet(object):
 		# Conv2D then ReLU activation
 		conv2d2 = layers.Conv2D(n_filters, 3, padding = "same", activation = "relu", kernel_initializer = "he_normal")
 		out2 = layers.TimeDistributed(conv2d2)(out1)
-		print("TimeDist shape:", out2.shape)
+		# print("TimeDist shape:", out2.shape)
 
 		return out2
 
@@ -41,7 +41,7 @@ class UNet(object):
 		# upsample
 		conv2dT1 = layers.Conv2DTranspose(n_filters, 3, 2, padding="same")
 		out1 = layers.TimeDistributed(conv2dT1)(x)
-		print("Upsample shape:", out1.shape)
+		# print("Upsample shape:", out1.shape)
 		# concatenate
 		x = layers.concatenate([out1, conv_features])
 		# dropout
@@ -79,20 +79,20 @@ class UNet(object):
 		u8 = self.upsample_block(u7, f2, 128)
 		# 9 - upsample
 		u9 = self.upsample_block(u8, f1, 64)
-		print("U9:", u9.shape)
+		# print("U9:", u9.shape)
 
 		# u10 = layers.Reshape((2,384,384,32))(u9)
 		# print(u10.shape)
 
 		u11 = layers.ConvLSTM2D(16, kernel_size=3, padding='same')(u9)
-		print("U11:", u11.shape)
+		# print("U11:", u11.shape)
 
 		# outputs
 		outputs = layers.Conv2D(2, 3, padding="same", activation = "softmax")(u11)
-		print("outputs:", outputs.shape)
+		# print("outputs:", outputs.shape)
 
 		# unet model with Keras Functional API
-		unet_model = tf.keras.Model(inputs, outputs, name="U-Net")
+		unet_model = tf.keras.Model(inputs, outputs, name="Sequential_U-Net")
 
 		return unet_model
 
