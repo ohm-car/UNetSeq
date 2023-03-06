@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=seqArt
 #SBATCH --mail-user=omkark1@umbc.edu
-#SBATCH --mem=32G
+#SBATCH --mem=144G
 #SBATCH --gres=gpu:6
 #SBATCH --time=10-12:00:00
 #SBATCH --constraint=rtx_6000
