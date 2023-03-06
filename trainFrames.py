@@ -82,89 +82,89 @@ if __name__ == '__main__':
     strategy = tf.distribute.MirroredStrategy()
     print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-    # with strategy.scope():
+    with strategy.scope():
 
-    unet_model = UNet().create_model(seqlen = seqlen)
+        unet_model = UNet().create_model(seqlen = seqlen)
 
-    # print(len(imgs))
-    # print(len(masks))
+        # print(len(imgs))
+        # print(len(masks))
 
-    # print(type(unet_model))
-    # unet_model.build(input_shape = (128,128,3))
-    unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
-                      loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                      metrics="accuracy")
+        # print(type(unet_model))
+        # unet_model.build(input_shape = (128,128,3))
+        unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
+                          loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                          metrics="accuracy")
 
-    print(unet_model.summary())
+        print(unet_model.summary())
 
-    # BATCH_SIZE = 16
-    # BUFFER_SIZE = 1000
-    # train_batches = data_tr.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
-    # train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    # validation_batches = data_ts.take(3000).batch(BATCH_SIZE)
-    # test_batches = data_ts.skip(3000).take(669).batch(BATCH_SIZE)
+        # BATCH_SIZE = 16
+        # BUFFER_SIZE = 1000
+        # train_batches = data_tr.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+        # train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        # validation_batches = data_ts.take(3000).batch(BATCH_SIZE)
+        # test_batches = data_ts.skip(3000).take(669).batch(BATCH_SIZE)
 
-    # NUM_EPOCHS = 20
+        # NUM_EPOCHS = 20
 
-    # TRAIN_LENGTH = info.splits["train"].num_examples
-    # STEPS_PER_EPOCH = TRAIN_LENGTH // BATCH_SIZE
+        # TRAIN_LENGTH = info.splits["train"].num_examples
+        # STEPS_PER_EPOCH = TRAIN_LENGTH // BATCH_SIZE
 
-    # VAL_SUBSPLITS = 5
-    # TEST_LENTH = info.splits["test"].num_examples
-    # VALIDATION_STEPS = TEST_LENTH // BATCH_SIZE // VAL_SUBSPLITS
+        # VAL_SUBSPLITS = 5
+        # TEST_LENTH = info.splits["test"].num_examples
+        # VALIDATION_STEPS = TEST_LENTH // BATCH_SIZE // VAL_SUBSPLITS
 
-    # print(type(info))
+        # print(type(info))
 
-    #create callbacks
+        #create callbacks
 
-    callbacks = [
-                # keras.callbacks.TensorBoard(log_dir=self.log_dir,
-                #                             histogram_freq=0, write_graph=True, write_images=False),
-                tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
-                                                verbose=0, save_weights_only=False, save_freq = 5*train_gen.__len__()),
-            ]
+        callbacks = [
+                    # keras.callbacks.TensorBoard(log_dir=self.log_dir,
+                    #                             histogram_freq=0, write_graph=True, write_images=False),
+                    tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
+                                                    verbose=0, save_weights_only=False, save_freq = 5*train_gen.__len__()),
+                ]
 
-    # model_history = unet_model.fit(
-    #     x=train_gen,
-    #     batch_size=1,
-    #     epochs=1,
-    #     verbose='auto',
-    #     callbacks=None,
-    #     validation_split=None,
-    #     validation_data=(imgs, masks),
-    #     shuffle=True,
-    #     class_weight=None,
-    #     sample_weight=None,
-    #     initial_epoch=0,
-    #     steps_per_epoch=None,
-    #     validation_steps=None,
-    #     validation_batch_size=None,
-    #     validation_freq=1,
-    #     max_queue_size=10,
-    #     workers=1,
-    #     use_multiprocessing=False
-    # )
+        # model_history = unet_model.fit(
+        #     x=train_gen,
+        #     batch_size=1,
+        #     epochs=1,
+        #     verbose='auto',
+        #     callbacks=None,
+        #     validation_split=None,
+        #     validation_data=(imgs, masks),
+        #     shuffle=True,
+        #     class_weight=None,
+        #     sample_weight=None,
+        #     initial_epoch=0,
+        #     steps_per_epoch=None,
+        #     validation_steps=None,
+        #     validation_batch_size=None,
+        #     validation_freq=1,
+        #     max_queue_size=10,
+        #     workers=1,
+        #     use_multiprocessing=False
+        # )
 
-    model_history = unet_model.fit(
-        x=train_gen,
-        # batch_size=1,
-        epochs=80,
-        verbose=1,
-        callbacks=callbacks,
-        # validation_split=None,
-        validation_data=val_gen,
-        shuffle=True,
-        class_weight=None,
-        sample_weight=None,
-        initial_epoch=0,
-        steps_per_epoch=None,
-        # validation_steps=None,
-        # validation_batch_size=None,
-        validation_freq=1,
-        max_queue_size=10,
-        workers=1,
-        use_multiprocessing=False
-    )
+        model_history = unet_model.fit(
+            x=train_gen,
+            # batch_size=1,
+            epochs=80,
+            verbose=1,
+            callbacks=callbacks,
+            # validation_split=None,
+            validation_data=val_gen,
+            shuffle=True,
+            class_weight=None,
+            sample_weight=None,
+            initial_epoch=0,
+            steps_per_epoch=None,
+            # validation_steps=None,
+            # validation_batch_size=None,
+            validation_freq=1,
+            max_queue_size=10,
+            workers=1,
+            use_multiprocessing=False
+        )
 
     # unet_model.save('trialModel')
     # unet_model.save('trm1', save_format='h5')
