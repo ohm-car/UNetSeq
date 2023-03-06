@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import tensorflow as tf
 # from utils.k_dataset import DatasetTrial
 from unet.unet_model_keras import UNet
