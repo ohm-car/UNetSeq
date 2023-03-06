@@ -1,5 +1,5 @@
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import tensorflow as tf
 # from utils.k_dataset import DatasetTrial
 from unet.unet_model_keras import UNet
@@ -41,8 +41,8 @@ def load_sequences_lists(seqlen, vid_ids):
 
 if __name__ == '__main__':
 
-    seqlen = 5
-    BATCH_SIZE = 2
+    seqlen = 9
+    BATCH_SIZE = 4
 
     # seq_list, mask_list = load_sequences_lists(seqlen)
 
@@ -64,8 +64,8 @@ if __name__ == '__main__':
 
     # print(load_sequences_lists(3, train_vid_ids))
 
-    train_seq, train_mask = load_sequences_lists(3, train_vid_ids)
-    val_seq, val_mask = load_sequences_lists(3, val_vid_ids)
+    train_seq, train_mask = load_sequences_lists(seqlen, train_vid_ids)
+    val_seq, val_mask = load_sequences_lists(seqlen, val_vid_ids)
 
     train_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, train_seq, train_mask, seqlen)
     val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, val_seq, val_mask, seqlen)
