@@ -42,7 +42,7 @@ def load_sequences_lists(seqlen, vid_ids):
 if __name__ == '__main__':
 
     seqlen = 13
-    BATCH_SIZE = 16
+    BATCH_SIZE = 12
 
     # seq_list, mask_list = load_sequences_lists(seqlen)
 
