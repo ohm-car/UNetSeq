@@ -41,7 +41,7 @@ def load_sequences_lists(seqlen, vid_ids):
 
 if __name__ == '__main__':
 
-    seqlen = 13
+    seqlen = 11
     BATCH_SIZE = 12
 
     # seq_list, mask_list = load_sequences_lists(seqlen)
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     print(rootDir)
     imageDir = os.path.join(rootDir, 'data/Img_All_Squared/')
     masksDir = os.path.join(rootDir, 'data/Masks_All_Squared/')
-    checkpoint_path = os.path.join(rootDir, 'UNetSeq/checkpoints/model_{epoch:03d}')
+    checkpoint_path = os.path.join(rootDir, 'UNetSeq/checkpoints/runs_slen_' + str(seqlen) + '/model_{epoch:03d}')
 
     # imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
     # masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
