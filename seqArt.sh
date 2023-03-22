@@ -6,12 +6,12 @@
 #SBATCH --gres=gpu:4
 #SBATCH --time=10-12:00:00
 #SBATCH --constraint=rtx_6000
-#SBATCH --output=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_5.out
-#SBATCH --error=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_5.err
+#SBATCH --output=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_6.out
+#SBATCH --error=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_6.err
 
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 
-source activate mrcnn2
+source activate mrcnn9
 
 python /nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/trainFrames.py
