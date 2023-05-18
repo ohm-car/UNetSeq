@@ -1,88 +1,76 @@
-from os.path import splitext
-from os import listdir
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import tensorflow_datasets as tfds
+import matplotlib.pyplot as plt
 import numpy as np
-from glob import glob
-import torch
-from torch.utils.data import Dataset
-import logging
-import PIL
-from PIL import Image, ImageOps
 
+class DatasetTrial(object):
+	"""docstring for ClassName"""
+	def __init__(self):
+		super(DatasetTrial, self).__init__()
+		self.dataset, self.info = tfds.load('oxford_iiit_pet:3.*.*', with_info=True)
+		print(self.dataset["train"])
+		print(self.dataset["test"])
+		
+		# self.arg = arg
+		
 
-class BasicDataset(Dataset):
-    def __init__(self, imgs_dir, masks_dir, scale=1, mask_suffix=''):
-        self.imgs_dir = imgs_dir
-        self.masks_dir = masks_dir
-        self.scale = scale
-        self.mask_suffix = mask_suffix
-        assert 0 < scale <= 1, 'Scale must be between 0 and 1'
+	def resize(self, input_image, input_mask):
+		input_image = tf.image.resize(input_image, (128, 128), method="nearest")
+		input_mask = tf.image.resize(input_mask, (128, 128), method="nearest")
 
-        self.ids = [splitext(file)[0] for file in listdir(imgs_dir)
-                    if not file.startswith('.')]
-        logging.info(f'Creating dataset with {len(self.ids)} examples')
+		return input_image, input_mask
 
-    def __len__(self):
-        return len(self.ids)
+	def augment(self, input_image, input_mask):
+		if tf.random.uniform(()) > 0.5:
+			# Random flipping of the image and mask
+			input_image = tf.image.flip_left_right(input_image)
+			input_mask = tf.image.flip_left_right(input_mask)
 
-    @classmethod
-    def preprocess(cls, pil_img, scale):
-        w, h = pil_img.size
-        newW, newH = int(scale * w), int(scale * h)
-        assert newW > 0 and newH > 0, 'Scale is too small'
-        pil_img = pil_img.resize((newW, newH))
+		return input_image, input_mask
 
-        img_nd = np.array(pil_img)
+	def normalize(self, input_image, input_mask):
+		input_image = tf.cast(input_image, tf.float32) / 255.0
+		input_mask -= 1
+		return input_image, input_mask
 
-        if len(img_nd.shape) == 2:
-            img_nd = np.expand_dims(img_nd, axis=2)
+	def load_image_train(self, datapoint):
+		input_image = datapoint["image"]
+		input_mask = datapoint["segmentation_mask"]
+		input_image, input_mask = self.resize(input_image, input_mask)
+		input_image, input_mask = self.augment(input_image, input_mask)
+		input_image, input_mask = self.normalize(input_image, input_mask)
 
-        # HWC to CHW
-        img_trans = img_nd.transpose((2, 0, 1))
-        if img_trans.max() > 1:
-            img_trans = img_trans / 255
+		return input_image, input_mask
 
-        return img_trans
+	def load_image_test(self, datapoint):
+		input_image = datapoint["image"]
+		input_mask = datapoint["segmentation_mask"]
+		input_image, input_mask = self.resize(input_image, input_mask)
+		input_image, input_mask = self.normalize(input_image, input_mask)
 
-    def processMask(self, pilmask):
+		return input_image, input_mask
 
-        mask = np.asarray(pilmask)
+	def get_train_dataset(self):
+		train_dataset = self.dataset["train"].map(self.load_image_train, num_parallel_calls=tf.data.AUTOTUNE)
+		print((train_dataset))
+		return train_dataset
 
-        mask = np.sum(mask, axis = 2)
-        mask = mask == 765
+	def get_test_dataset(self):
+		test_dataset = self.dataset["test"].map(self.load_image_test, num_parallel_calls=tf.data.AUTOTUNE)
+		print(type(test_dataset))
+		return test_dataset
 
-        return Image.fromarray(np.uint8(mask))
+	def get_info(self):
+		return self.info
 
+# train_dataset = dataset["train"].map(load_image_train, num_parallel_calls=tf.data.AUTOTUNE)
+# test_dataset = dataset["test"].map(load_image_test, num_parallel_calls=tf.data.AUTOTUNE)
 
-    def __getitem__(self, i):
-        idx = self.ids[i]
-        # print(self.imgs_dir, self.masks_dir, self.mask_suffix)
-        mask_file = glob(self.masks_dir + idx + self.mask_suffix + '.*')
-        # print(mask_file)
-        img_file = glob(self.imgs_dir + idx + '.*')
-        # print(img_file)
-
-        assert len(mask_file) == 1, \
-            f'Either no mask or multiple masks found for the ID {idx}: {mask_file}'
-        assert len(img_file) == 1, \
-            f'Either no image or multiple images found for the ID {idx}: {img_file}'
-        mask = Image.open(mask_file[0])
-        mask = self.processMask(mask)
-        img = Image.open(img_file[0])
-        # print(type(mask))
-
-        assert img.size == mask.size, \
-            f'Image and mask {idx} should be the same size, but are {img.size} and {mask.size}'
-
-        img = self.preprocess(img, self.scale)
-        mask = self.preprocess(mask, self.scale)
-
-        return {
-            'image': torch.from_numpy(img).type(torch.FloatTensor),
-            'mask': torch.from_numpy(mask).type(torch.FloatTensor)
-        }
-
-
-class CarvanaDataset(BasicDataset):
-    def __init__(self, imgs_dir, masks_dir, scale=1):
-        # super().__init__(imgs_dir, masks_dir, scale, mask_suffix='_mask')
-        super().__init__(imgs_dir, masks_dir, scale, mask_suffix='')
+# BATCH_SIZE = 64
+# BUFFER_SIZE = 1000
+# train_batches = train_dataset.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+# train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+# validation_batches = test_dataset.take(3000).batch(BATCH_SIZE)
+# test_batches = test_dataset.skip(3000).take(669).batch(BATCH_SIZE)
