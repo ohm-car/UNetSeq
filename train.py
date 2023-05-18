@@ -1,9 +1,9 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import tensorflow as tf
 # from utils.k_dataset import DatasetTrial
 from unet.unet_model_keras import UNet
-from utils.k_datasetG import DatasetUSound
+from utils.datasetUSoundSeq import DatasetUSound
 # import skimage
 from pathlib import Path
 
@@ -58,8 +58,8 @@ val_vid_ids = ['v5']
 
 # print(load_sequences_lists(3, train_vid_ids))
 
-train_seq, train_mask = load_sequences_lists(3, train_vid_ids)
-val_seq, val_mask = load_sequences_lists(3, val_vid_ids)
+train_seq, train_mask = load_sequences_lists(seqlen, train_vid_ids)
+val_seq, val_mask = load_sequences_lists(seqlen, val_vid_ids)
 
 train_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, train_seq, train_mask, seqlen)
 val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, val_seq, val_mask, seqlen)
@@ -115,7 +115,7 @@ callbacks = [
             tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                             verbose=0, save_weights_only=False, save_freq = 5*train_gen.__len__()),
         ]
-
+# *train_gen.__len__()
 # model_history = unet_model.fit(
 #     x=train_gen,
 #     batch_size=1,
