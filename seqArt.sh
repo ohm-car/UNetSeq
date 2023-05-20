@@ -6,6 +6,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --time=10-12:00:00
 #SBATCH --constraint=rtx_6000
+#SBATCH --exclude=g06
 #SBATCH --output=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_10.out
 #SBATCH --error=/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/outfiles/seqArt_run_10.err
 
