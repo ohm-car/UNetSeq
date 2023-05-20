@@ -14,4 +14,4 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/
 
 source activate mrcnn9
 
-python /nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/train.py
+python /nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/train.py > test.txt

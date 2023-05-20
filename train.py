@@ -39,7 +39,7 @@ def load_sequences_lists(seqlen, vid_ids):
     return seq_list, mask_list
 
 seqlen = 3
-BATCH_SIZE = 4
+BATCH_SIZE = 1
 
 # seq_list, mask_list = load_sequences_lists(seqlen)
 
