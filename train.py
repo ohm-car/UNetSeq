@@ -1,4 +1,10 @@
+import argparse
+import logging
 import os
+import sys
+from pathlib import Path
+from tqdm import tqdm
+import datetime
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import tensorflow as tf
 # from utils.k_dataset import DatasetTrial
@@ -38,126 +44,150 @@ def load_sequences_lists(seqlen, vid_ids):
 
     return seq_list, mask_list
 
-seqlen = 3
-BATCH_SIZE = 4
+# seqlen = 3
+# BATCH_SIZE = 4
 
-# seq_list, mask_list = load_sequences_lists(seqlen)
+# # seq_list, mask_list = load_sequences_lists(seqlen)
 
-rootDir = Path(__file__).resolve().parent.parent
-print(rootDir)
-imageDir = os.path.join(rootDir, 'data/Img_All_Squared/')
-masksDir = os.path.join(rootDir, 'data/Masks_All_Squared/')
-checkpoint_path = os.path.join(rootDir, 'UNetSeq/checkpoints/model_{epoch:03d}')
+# rootDir = Path(__file__).resolve().parent
+# print(rootDir)
+# imageDir = os.path.join(rootDir.parent, 'data/Img_All_Squared/')
+# masksDir = os.path.join(rootDir.parent, 'data/Masks_All_Squared/')
+# checkpoint_path = os.path.join(rootDir, 'UNetSeq/checkpoints/model_{epoch:03d}')
 
-# imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
-# masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
-# checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpointsR4/model_{epoch:03d}"
+# # imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
+# # masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
+# # checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpointsR4/model_{epoch:03d}"
 
-train_vid_ids = ['v1', 'v2', 'v3', 'v4', 'v6']
-val_vid_ids = ['v5']
+# train_vid_ids = ['v1', 'v2', 'v3', 'v4', 'v6']
+# val_vid_ids = ['v5']
 
-# print(load_sequences_lists(3, train_vid_ids))
+# # print(load_sequences_lists(3, train_vid_ids))
 
-train_seq, train_mask = load_sequences_lists(seqlen, train_vid_ids)
-val_seq, val_mask = load_sequences_lists(seqlen, val_vid_ids)
+# train_seq, train_mask = load_sequences_lists(seqlen, train_vid_ids)
+# val_seq, val_mask = load_sequences_lists(seqlen, val_vid_ids)
 
-train_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, train_seq, train_mask, seqlen)
-val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, val_seq, val_mask, seqlen)
+# train_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, train_seq, train_mask, seqlen)
+# val_gen = DatasetUSound(BATCH_SIZE, imageDir, masksDir, val_seq, val_mask, seqlen)
 
-# dataset = DatasetUSound()
-print(train_gen.__class__.__bases__)
-print(train_gen.__getitem__(14)[0].shape)
-print(train_gen.__getitem__(14)[1].shape)
-# print(train_gen.__getitem__(14)[1])
-# imgs, masks = dataset.load_dataset()
+# # dataset = DatasetUSound()
+# print(train_gen.__class__.__bases__)
+# print(train_gen.__getitem__(14)[0].shape)
+# print(train_gen.__getitem__(14)[1].shape)
+# # print(train_gen.__getitem__(14)[1])
+# # imgs, masks = dataset.load_dataset()
 
-# strategy = tf.distribute.MirroredStrategy()
-# print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+# # strategy = tf.distribute.MirroredStrategy()
+# # print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
 
-# with strategy.scope():
+# # with strategy.scope():
 
-unet_model = UNet().create_model(seqlen = seqlen)
+# unet_model = UNet().create_model(seqlen = seqlen)
 
-# print(len(imgs))
-# print(len(masks))
+# # print(len(imgs))
+# # print(len(masks))
 
-# print(type(unet_model))
-# unet_model.build(input_shape = (128,128,3))
-unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
-                  loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                  metrics="accuracy")
+# # print(type(unet_model))
+# # unet_model.build(input_shape = (128,128,3))
+# unet_model.compile(optimizer=tf.keras.optimizers.Adam(clipvalue=0.2),
+#                   loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+#                   metrics="accuracy")
 
-# print(unet_model.summary())
+# # print(unet_model.summary())
 
-# BATCH_SIZE = 16
-# BUFFER_SIZE = 1000
-# train_batches = data_tr.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
-# train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-# validation_batches = data_ts.take(3000).batch(BATCH_SIZE)
-# test_batches = data_ts.skip(3000).take(669).batch(BATCH_SIZE)
+# # BATCH_SIZE = 16
+# # BUFFER_SIZE = 1000
+# # train_batches = data_tr.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+# # train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+# # validation_batches = data_ts.take(3000).batch(BATCH_SIZE)
+# # test_batches = data_ts.skip(3000).take(669).batch(BATCH_SIZE)
 
-# NUM_EPOCHS = 20
+# # NUM_EPOCHS = 20
 
-# TRAIN_LENGTH = info.splits["train"].num_examples
-# STEPS_PER_EPOCH = TRAIN_LENGTH // BATCH_SIZE
+# # TRAIN_LENGTH = info.splits["train"].num_examples
+# # STEPS_PER_EPOCH = TRAIN_LENGTH // BATCH_SIZE
 
-# VAL_SUBSPLITS = 5
-# TEST_LENTH = info.splits["test"].num_examples
-# VALIDATION_STEPS = TEST_LENTH // BATCH_SIZE // VAL_SUBSPLITS
+# # VAL_SUBSPLITS = 5
+# # TEST_LENTH = info.splits["test"].num_examples
+# # VALIDATION_STEPS = TEST_LENTH // BATCH_SIZE // VAL_SUBSPLITS
 
-# print(type(info))
+# # print(type(info))
 
-#create callbacks
+# #create callbacks
 
-callbacks = [
-            # keras.callbacks.TensorBoard(log_dir=self.log_dir,
-            #                             histogram_freq=0, write_graph=True, write_images=False),
-            tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
-                                            verbose=0, save_weights_only=False, save_freq = 5*train_gen.__len__()),
-        ]
-# *train_gen.__len__()
+# callbacks = [
+#             # keras.callbacks.TensorBoard(log_dir=self.log_dir,
+#             #                             histogram_freq=0, write_graph=True, write_images=False),
+#             tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
+#                                             verbose=0, save_weights_only=False, save_freq = 5*train_gen.__len__()),
+#         ]
+# # *train_gen.__len__()
+# # model_history = unet_model.fit(
+# #     x=train_gen,
+# #     batch_size=1,
+# #     epochs=1,
+# #     verbose='auto',
+# #     callbacks=None,
+# #     validation_split=None,
+# #     validation_data=(imgs, masks),
+# #     shuffle=True,
+# #     class_weight=None,
+# #     sample_weight=None,
+# #     initial_epoch=0,
+# #     steps_per_epoch=None,
+# #     validation_steps=None,
+# #     validation_batch_size=None,
+# #     validation_freq=1,
+# #     max_queue_size=10,
+# #     workers=1,
+# #     use_multiprocessing=False
+# # )
+
 # model_history = unet_model.fit(
 #     x=train_gen,
-#     batch_size=1,
-#     epochs=1,
-#     verbose='auto',
-#     callbacks=None,
-#     validation_split=None,
-#     validation_data=(imgs, masks),
+#     # batch_size=1,
+#     epochs=80,
+#     verbose=1,
+#     callbacks=callbacks,
+#     # validation_split=None,
+#     validation_data=val_gen,
 #     shuffle=True,
 #     class_weight=None,
 #     sample_weight=None,
 #     initial_epoch=0,
 #     steps_per_epoch=None,
-#     validation_steps=None,
-#     validation_batch_size=None,
+#     # validation_steps=None,
+#     # validation_batch_size=None,
 #     validation_freq=1,
 #     max_queue_size=10,
 #     workers=1,
 #     use_multiprocessing=False
 # )
 
-model_history = unet_model.fit(
-    x=train_gen,
-    # batch_size=1,
-    epochs=80,
-    verbose=1,
-    callbacks=callbacks,
-    # validation_split=None,
-    validation_data=val_gen,
-    shuffle=True,
-    class_weight=None,
-    sample_weight=None,
-    initial_epoch=0,
-    steps_per_epoch=None,
-    # validation_steps=None,
-    # validation_batch_size=None,
-    validation_freq=1,
-    max_queue_size=10,
-    workers=1,
-    use_multiprocessing=False
-)
-
 # unet_model.save('trialModel')
 # unet_model.save('trm1', save_format='h5')
 # m2 = tf.keras.models.load_model('trialModel')
+
+def get_args():
+    parser = argparse.ArgumentParser(description='Train the Sequential UNet on images and target masks',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-e', '--epochs', metavar='E', type=int, default=5,
+                        help='Number of epochs', dest='epochs')
+    parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=2,
+                        help='Batch size', dest='batchsize')
+    parser.add_argument('-sl', '--sequenceLength', metavar='B', type=int, nargs='?', default=3,
+                        help='Length of the sequence', dest='seqlen')
+    parser.add_argument('-l', '--learning-rate', metavar='LR', type=float, nargs='?', default=0.0001,
+                        help='Learning rate', dest='lr')
+    parser.add_argument('-f', '--load', dest='load', type=str, default=False,
+                        help='Load model from a .pth file')
+    parser.add_argument('-s', '--scale', dest='scale', type=float, default=0.5,
+                        help='Downscaling factor of the images')
+    parser.add_argument('-v', '--validation', dest='val', type=float, default=10.0,
+                        help='Percent of the data that is used as validation (0-100)')
+
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    args = get_args()
+    print("HI", args.batchsize, args.epochs, args.seqlen)
