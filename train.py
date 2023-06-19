@@ -171,9 +171,11 @@ def load_sequences_lists(seqlen, vid_ids):
 def get_args():
     parser = argparse.ArgumentParser(description='Train the Sequential UNet on images and target masks',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-e', '--epochs', metavar='E', type=int, default=5,
+    parser.add_argument('-e', '--epochs', metavar='E', type=int, default=50,
                         help='Number of epochs', dest='epochs')
-    parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=2,
+    parser.add_argument('-sf', '--epochs', metavar='SF', type=int, default=5,
+                        help='Checkpoint save frequency', dest='save_freq')
+    parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=1,
                         help='Batch size', dest='batchsize')
     parser.add_argument('-sl', '--sequenceLength', metavar='B', type=int, nargs='?', default=3,
                         help='Length of the sequence', dest='seqlen')
@@ -181,13 +183,142 @@ def get_args():
                         help='Learning rate', dest='lr')
     parser.add_argument('-f', '--load', dest='load', type=str, default=False,
                         help='Load model from a .pth file')
-    parser.add_argument('-s', '--scale', dest='scale', type=float, default=0.5,
-                        help='Downscaling factor of the images')
-    parser.add_argument('-v', '--validation', dest='val', type=float, default=10.0,
-                        help='Percent of the data that is used as validation (0-100)')
+    # parser.add_argument('-s', '--scale', dest='scale', type=float, default=0.5,
+    #                     help='Downscaling factor of the images')
+    # parser.add_argument('-v', '--validation', dest='val', type=float, default=10.0,
+    #                     help='Percent of the data that is used as validation (0-100)')
+    parser.add_argument('-v', '--validation_video', dest='val', type=str, default='v6',
+                        help='Video used as validation video')
 
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = get_args()
     print("HI", args.batchsize, args.epochs, args.seqlen)
+
+    seqlen = args.seqlen
+    BATCH_SIZE = args.batchsize
+
+    # seq_list, mask_list = load_sequences_lists(args.seqlen)
+
+    rootDir = Path(__file__).resolve().parent
+    print(rootDir)
+    imageDir = os.path.join(rootDir.parent, 'data/Img_All_Squared/')
+    masksDir = os.path.join(rootDir.parent, 'data/Masks_All_Squared/')
+    checkpoint_path = os.path.join(rootDir, 'UNetSeq/checkpoints/model_{epoch:03d}')
+
+    # # imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
+    # # masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
+    # # checkpoint_path = "/nfs/ada/oates/users/omkark1/ArteryProj/UNetSeq/checkpointsR4/model_{epoch:03d}"
+
+
+
+    train_vid_ids = ['v1', 'v2', 'v3', 'v4', 'v5', 'v6']
+    val_vid_ids = [args.val]
+    train_vid_ids.remove(val_vid_ids[0])
+
+    # # print(load_sequences_lists(args.seqlen, train_vid_ids))
+
+    train_seq, train_mask = load_sequences_lists(args.seqlen, train_vid_ids)
+    val_seq, val_mask = load_sequences_lists(args.seqlen, val_vid_ids)
+
+    train_gen = DatasetUSound(args.batchsize, imageDir, masksDir, train_seq, train_mask, args.seqlen)
+    val_gen = DatasetUSound(args.batchsize, imageDir, masksDir, val_seq, val_mask, args.seqlen)
+
+    # # dataset = DatasetUSound()
+    # print(train_gen.__class__.__bases__)
+    # print(train_gen.__getitem__(14)[0].shape)
+    # print(train_gen.__getitem__(14)[1].shape)
+    # # print(train_gen.__getitem__(14)[1])
+    # # imgs, masks = dataset.load_dataset()
+
+    # # strategy = tf.distribute.MirroredStrategy()
+    # # print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+
+    # # with strategy.scope():
+
+    unet_model = UNet().create_model(seqlen = seqlen)
+
+    # # print(len(imgs))
+    # # print(len(masks))
+
+    # # print(type(unet_model))
+    # # unet_model.build(input_shape = (128,128,3))
+    unet_model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate = args.lr, clipvalue=0.2),
+                      loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                      metrics="accuracy")
+
+    # # print(unet_model.summary())
+
+    # # BATCH_SIZE = 16
+    # # BUFFER_SIZE = 1000
+    # # train_batches = data_tr.cache().shuffle(BUFFER_SIZE).batch(BATCH_SIZE).repeat()
+    # # train_batches = train_batches.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    # # validation_batches = data_ts.take(3000).batch(BATCH_SIZE)
+    # # test_batches = data_ts.skip(3000).take(669).batch(BATCH_SIZE)
+
+    # # NUM_EPOCHS = 20
+
+    # # TRAIN_LENGTH = info.splits["train"].num_examples
+    # # STEPS_PER_EPOCH = TRAIN_LENGTH // BATCH_SIZE
+
+    # # VAL_SUBSPLITS = 5
+    # # TEST_LENTH = info.splits["test"].num_examples
+    # # VALIDATION_STEPS = TEST_LENTH // BATCH_SIZE // VAL_SUBSPLITS
+
+    # # print(type(info))
+
+    # #create callbacks
+
+    callbacks = [
+                # keras.callbacks.TensorBoard(log_dir=self.log_dir,
+                #                             histogram_freq=0, write_graph=True, write_images=False),
+                tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
+                                                verbose=0, save_weights_only=False, save_freq = args.save_freq*train_gen.__len__()),
+            ]
+    # # *train_gen.__len__()
+    # # model_history = unet_model.fit(
+    # #     x=train_gen,
+    # #     batch_size=1,
+    # #     epochs=1,
+    # #     verbose='auto',
+    # #     callbacks=None,
+    # #     validation_split=None,
+    # #     validation_data=(imgs, masks),
+    # #     shuffle=True,
+    # #     class_weight=None,
+    # #     sample_weight=None,
+    # #     initial_epoch=0,
+    # #     steps_per_epoch=None,
+    # #     validation_steps=None,
+    # #     validation_batch_size=None,
+    # #     validation_freq=1,
+    # #     max_queue_size=10,
+    # #     workers=1,
+    # #     use_multiprocessing=False
+    # # )
+
+    model_history = unet_model.fit(
+        x=train_gen,
+        # batch_size=1,
+        epochs=args.epochs,
+        verbose=1,
+        callbacks=callbacks,
+        # validation_split=None,
+        validation_data=val_gen,
+        shuffle=True,
+        class_weight=None,
+        sample_weight=None,
+        initial_epoch=0,
+        steps_per_epoch=None,
+        # validation_steps=None,
+        # validation_batch_size=None,
+        validation_freq=1,
+        max_queue_size=10,
+        workers=2,
+        use_multiprocessing=False
+    )
+
+    unet_model.save('trialModel')
+    unet_model.save('trm1', save_format='h5')
+    m2 = tf.keras.models.load_model('trialModel')
