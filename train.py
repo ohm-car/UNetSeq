@@ -206,11 +206,13 @@ if __name__ == '__main__':
     imageDir = os.path.join(rootDir.parent, 'data/Img_All_Squared/')
     masksDir = os.path.join(rootDir.parent, 'data/Masks_All_Squared/')
     tm = datetime.datetime.now()
-    checkpoint_path = os.path.join(rootDir, 'checkpoints/{:02d}-{:02d}/{:02d}-{:02d}-{:02d}/model_{epoch:03d}.h5'.format(tm.month, tm.day, tm.hour, tm.minute, tm.second))
+    
     checkpoint_dir = os.path.join(rootDir, 'checkpoints/{:02d}-{:02d}/{:02d}-{:02d}-{:02d}/'.format(tm.month, tm.day, tm.hour, tm.minute, tm.second))
 
-    if not os.path.exists(checkpoint_dir):
-        os.makedirs(checkpoint_dir)
+    checkpoint_path = os.path.join(checkpoint_dir, 'model_{epoch:03d}.h5')
+
+    # if not os.path.exists(checkpoint_dir):
+        # os.makedirs(checkpoint_dir)
 
     # # imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
     # # masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
