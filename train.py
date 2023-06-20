@@ -173,11 +173,11 @@ def get_args():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-e', '--epochs', metavar='E', type=int, default=50,
                         help='Number of epochs', dest='epochs')
-    parser.add_argument('-sf', '--epochs', metavar='SF', type=int, default=5,
+    parser.add_argument('-sf', '--save-frequecy', metavar='SF', type=int, default=5,
                         help='Checkpoint save frequency', dest='save_freq')
     parser.add_argument('-b', '--batch-size', metavar='B', type=int, nargs='?', default=1,
                         help='Batch size', dest='batchsize')
-    parser.add_argument('-sl', '--sequenceLength', metavar='B', type=int, nargs='?', default=3,
+    parser.add_argument('-sl', '--sequenceLength', metavar='SL', type=int, nargs='?', default=3,
                         help='Length of the sequence', dest='seqlen')
     parser.add_argument('-l', '--learning-rate', metavar='LR', type=float, nargs='?', default=0.0001,
                         help='Learning rate', dest='lr')
@@ -194,7 +194,7 @@ def get_args():
 
 if __name__ == '__main__':
     args = get_args()
-    print("HI", args.batchsize, args.epochs, args.seqlen)
+    # print("HI", args.batchsize, args.epochs, args.seqlen)
 
     seqlen = args.seqlen
     BATCH_SIZE = args.batchsize
@@ -205,7 +205,12 @@ if __name__ == '__main__':
     print(rootDir)
     imageDir = os.path.join(rootDir.parent, 'data/Img_All_Squared/')
     masksDir = os.path.join(rootDir.parent, 'data/Masks_All_Squared/')
-    checkpoint_path = os.path.join(rootDir, 'UNetSeq/checkpoints/model_{epoch:03d}')
+    tm = datetime.datetime.now()
+    checkpoint_path = os.path.join(rootDir, 'checkpoints/{:02d}-{:02d}/{:02d}-{:02d}-{:02d}/model_{epoch:03d}.h5'.format(tm.month, tm.day, tm.hour, tm.minute, tm.second))
+    checkpoint_dir = os.path.join(rootDir, 'checkpoints/{:02d}-{:02d}/{:02d}-{:02d}-{:02d}/'.format(tm.month, tm.day, tm.hour, tm.minute, tm.second))
+
+    if not os.path.exists(checkpoint_dir):
+        os.makedirs(checkpoint_dir)
 
     # # imageDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Img_All_Squared/'
     # # masksDir = '/nfs/ada/oates/users/omkark1/ArteryProj/data/Masks_All_Squared/'
@@ -275,6 +280,8 @@ if __name__ == '__main__':
                 #                             histogram_freq=0, write_graph=True, write_images=False),
                 tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                 verbose=0, save_weights_only=False, save_freq = args.save_freq*train_gen.__len__()),
+                # tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
+                #                                 verbose=0, save_weights_only=False, save_freq = 100),
             ]
     # # *train_gen.__len__()
     # # model_history = unet_model.fit(
@@ -319,6 +326,6 @@ if __name__ == '__main__':
         use_multiprocessing=False
     )
 
-    unet_model.save('trialModel')
-    unet_model.save('trm1', save_format='h5')
-    m2 = tf.keras.models.load_model('trialModel')
+    # unet_model.save('trialModel')
+    # unet_model.save('trm1', save_format='h5')
+    # m2 = tf.keras.models.load_model('trialModel')
